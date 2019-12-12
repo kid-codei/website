@@ -5,13 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "234920811",
+    "hash" : "2453254060",
     "id" : "9CA37144",
-    "lastKnownWriteTime" : 1576115506,
-    "last_content_update" : 1576115506,
+    "lastKnownWriteTime" : 1576129890,
+    "last_content_update" : 1576129890189,
     "path" : "~/Desktop/website/content/blog/2019-12-11-my-first-blog-post.Rmd",
     "project_path" : "content/blog/2019-12-11-my-first-blog-post.Rmd",
     "properties" : {
+        "cursorPosition" : "10,11",
+        "scrollLine" : "0"
     },
     "read_only" : false,
     "read_only_alternatives" : [
