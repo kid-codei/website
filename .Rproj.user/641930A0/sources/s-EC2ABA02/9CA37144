@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576115506634.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "234920811",
+    "id" : "9CA37144",
+    "lastKnownWriteTime" : 1576115506,
+    "last_content_update" : 1576115506,
+    "path" : "~/Desktop/website/content/blog/2019-12-11-my-first-blog-post.Rmd",
+    "project_path" : "content/blog/2019-12-11-my-first-blog-post.Rmd",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
