@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="John Henry Cruz" />
+    <meta name="description" content="Describe your website">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>project2_jec4968</title>
+    <meta name="generator" content="Hugo 0.61.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project2/">project2_jec4968</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="project-2" class="section level2">
+<h2>Project 2</h2>
+<pre class="r"><code>library(readr)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.1     ✔ dplyr   0.8.3
+## ✔ tibble  2.1.3     ✔ stringr 1.4.0
+## ✔ tidyr   1.0.0     ✔ forcats 0.4.0
+## ✔ purrr   0.3.3</code></pre>
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(tidyr)
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(lmtest)</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre class="r"><code>library(sandwich)
+library(MASS)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MASS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre class="r"><code>library(plotROC)
+library(glmnet)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## Loaded glmnet 3.0-1</code></pre>
+</div>
+<div id="my-dataset" class="section level2">
+<h2>0) My Dataset</h2>
+<pre class="r"><code>combined_data &lt;- readr::read_csv(&quot;https://raw.githubusercontent.com/5harad/openpolicing/master/results/data_for_figures/combined_data.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   location = col_character(),
+##   state = col_character(),
+##   driver_race = col_character(),
+##   stops_per_year = col_double(),
+##   stop_rate = col_double(),
+##   search_rate = col_double(),
+##   consent_search_rate = col_double(),
+##   arrest_rate = col_double(),
+##   citation_rate_speeding_stops = col_double(),
+##   hit_rate = col_double(),
+##   inferred_threshold = col_double()
+## )</code></pre>
+<pre class="r"><code>open_policing &lt;- combined_data %&gt;% dplyr::select(1:8) %&gt;%na.omit() 
+
+open_policing_binary &lt;- open_policing %&gt;% mutate(consent_search_rate = case_when(consent_search_rate == 0 ~ 0, TRUE ~ 1)) %&gt;% rename(&#39;consent_search_bin&#39; = consent_search_rate)
+
+open_policing &lt;- left_join(open_policing, open_policing_binary)</code></pre>
+<pre><code>## Joining, by = c(&quot;location&quot;, &quot;state&quot;, &quot;driver_race&quot;, &quot;stops_per_year&quot;, &quot;stop_rate&quot;, &quot;search_rate&quot;, &quot;arrest_rate&quot;)</code></pre>
+<pre class="r"><code>open_policing_binary_2 &lt;- open_policing %&gt;% mutate(consent_search_rate = case_when(consent_search_rate == 0 ~ &#39;no&#39;, TRUE ~ &#39;yes&#39;)) %&gt;% rename(&#39;consent_search_cat&#39; = consent_search_rate)
+
+open_policing &lt;- left_join(open_policing, open_policing_binary_2)</code></pre>
+<pre><code>## Joining, by = c(&quot;location&quot;, &quot;state&quot;, &quot;driver_race&quot;, &quot;stops_per_year&quot;, &quot;stop_rate&quot;, &quot;search_rate&quot;, &quot;arrest_rate&quot;, &quot;consent_search_bin&quot;)</code></pre>
+<div id="the-combined_data-dataset-is-based-off-the-stanford-open-policing-project.-this-dataset-was-created-by-multiple-researchers-that-wanted-to-create-a-repository-detailing-interactions-between-the-police-and-the-public.-their-compiled-dataset-has-over-2-million-stops-so-this-dataset-from-github-is-a-small-part-of-it.-i-then-filtered-the-dataset-into-fewer-variables-that-i-was-more-interested-in-and-removed-nas.-this-made-the-dataset-work-so-that-both-categorical-variables-had-2-5-groups-and-all-numerical-variables-had-no-nas-except-the-location-variable-because-that-has-overlaps-that-needed-to-show-to-understand-the-data.-i-removed-3-numerical-variables-because-they-were-lacking-a-great-amount-of-data-across-multiple-states-and-multiple-driver-races.-i-also-wanted-to-make-sure-that-the-driver-races-in-each-numerical-variable-were-complete-in-the-sense-that-the-specific-location-in-that-state-had-a-complete-set-of-driver_racewhite-black-and-hispanic.-since-the-data-is-somewhat-grouped-by-location-i-wanted-to-make-sure-that-this-was-consistent-and-chose-the-numerical-variables-that-would-allow-this-to-happen.-since-the-consent_search_rate-variable-had-low-numerical-values-i-decided-to-make-those-that-were-0-to-0-and-any-instance-of-consent_search_rate-to-1-and-make-a-new-binary-variable-that-would-be-used-later-in-the-project.-the-varibles-are-location-the-county-that-the-stop-happened-in-state-where-the-traffic-stop-happened-driver_race-the-race-of-the-driver-stops_per_yearthe-number-of-stops-for-that-race-in-that-state-in-that-location-in-a-year-stop_rate-the-percentage-that-that-race-in-that-state-in-that-location-gets-stopped-search_rate-the-percentage-that-that-race-in-that-state-in-that-location-gets-searched-consent_search_rate-the-percentage-that-that-race-in-that-state-in-that-location-gets-searched-with-consent-and-arrest_rate-the-percentage-that-that-race-in-that-state-in-that-location-gets-arrested." class="section level4">
+<h4>The combined_data dataset is based off the Stanford Open Policing Project. This dataset was created by multiple researchers that wanted to create a repository detailing interactions between the police and the public. Their compiled dataset has over 2 million stops, so this dataset from GitHub is a small part of it. I then filtered the dataset into fewer variables that I was more interested in and removed NA’s. This made the dataset work so that both categorical variables had 2-5 groups and all numerical variables had no NA’s, except the location variable because that has overlaps that needed to show to understand the data. I removed 3 numerical variables because they were lacking a great amount of data across multiple states and multiple driver races. I also wanted to make sure that the driver races in each numerical variable were complete in the sense that the specific location in that state had a complete set of driver_race(White, Black, and Hispanic). Since the data is somewhat grouped by location, I wanted to make sure that this was consistent, and chose the numerical variables that would allow this to happen. Since the consent_search_rate variable had low numerical values, I decided to make those that were 0 to 0 and any instance of consent_search_rate to 1, and make a new binary variable that would be used later in the project. The varibles are location (the county that the stop happened in) state (where the traffic stop happened) driver_race (the race of the driver), stops_per_year(the number of stops for that race in that state in that location in a year), stop_rate (the percentage that that race in that state in that location gets stopped), search_rate (the percentage that that race in that state in that location gets searched), consent_search_rate (the percentage that that race in that state in that location gets searched with consent), and arrest_rate (the percentage that that race in that state in that location gets arrested).</h4>
+</div>
+</div>
+<div id="manova-testing" class="section level2">
+<h2>1) MANOVA Testing</h2>
+<div id="manova" class="section level3">
+<h3>MANOVA</h3>
+<pre class="r"><code>manova_data &lt;- manova(cbind(stops_per_year, stop_rate, search_rate, consent_search_rate, arrest_rate)~driver_race, data=combined_data)
+
+summary(manova_data)</code></pre>
+<pre><code>##              Df Pillai approx F num Df den Df    Pr(&gt;F)    
+## driver_race   2 0.4135   30.651     10   1176 &lt; 2.2e-16 ***
+## Residuals   591                                            
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="anova" class="section level3">
+<h3>ANOVA</h3>
+<pre class="r"><code>summary.aov(manova_data)</code></pre>
+<pre><code>##  Response stops_per_year :
+##              Df     Sum Sq    Mean Sq F value    Pr(&gt;F)    
+## driver_race   2 4.2621e+09 2131054561   77.54 &lt; 2.2e-16 ***
+## Residuals   591 1.6243e+10   27483191                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response stop_rate :
+##              Df  Sum Sq Mean Sq F value   Pr(&gt;F)   
+## driver_race   2   20.55  10.275   5.486 0.004358 **
+## Residuals   591 1106.95   1.873                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response search_rate :
+##              Df   Sum Sq    Mean Sq F value    Pr(&gt;F)    
+## driver_race   2 0.003109 0.00155452  30.773 1.934e-13 ***
+## Residuals   591 0.029855 0.00005052                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response consent_search_rate :
+##              Df    Sum Sq    Mean Sq F value    Pr(&gt;F)    
+## driver_race   2 0.0003719 1.8597e-04  22.928 2.571e-10 ***
+## Residuals   591 0.0047936 8.1110e-06                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##  Response arrest_rate :
+##              Df  Sum Sq  Mean Sq F value    Pr(&gt;F)    
+## driver_race   2 0.08748 0.043741  65.998 &lt; 2.2e-16 ***
+## Residuals   591 0.39169 0.000663                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 2094 observations deleted due to missingness</code></pre>
+</div>
+<div id="means-of-each-group-across-the-numerical-variables" class="section level3">
+<h3>Means of Each Group Across the Numerical Variables</h3>
+<pre class="r"><code>open_policing%&gt;%group_by(driver_race)%&gt;%summarize(mean(stops_per_year),mean(stop_rate),mean(search_rate),mean(consent_search_rate),mean(arrest_rate))</code></pre>
+<pre><code>## # A tibble: 3 x 6
+##   driver_race `mean(stops_per… `mean(stop_rate… `mean(search_ra…
+##   &lt;chr&gt;                  &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Black                  1964.            0.606          0.00894
+## 2 Hispanic               1594.            0.236          0.00971
+## 3 White                  7444.            0.189          0.00453
+## # … with 2 more variables: `mean(consent_search_rate)` &lt;dbl&gt;,
+## #   `mean(arrest_rate)` &lt;dbl&gt;</code></pre>
+</div>
+<div id="post-hoc-test-for-stops-per-year" class="section level3">
+<h3>Post Hoc test for Stops per Year</h3>
+<pre class="r"><code>pairwise.t.test(open_policing$stops_per_year,open_policing$driver_race,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  open_policing$stops_per_year and open_policing$driver_race 
+## 
+##          Black  Hispanic
+## Hispanic 0.48   -       
+## White    &lt;2e-16 &lt;2e-16  
+## 
+## P value adjustment method: none</code></pre>
+</div>
+<div id="post-hoc-test-for-stop-rate" class="section level3">
+<h3>Post Hoc test for Stop Rate</h3>
+<pre class="r"><code>pairwise.t.test(open_policing$stop_rate,open_policing$driver_race,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  open_policing$stop_rate and open_policing$driver_race 
+## 
+##          Black  Hispanic
+## Hispanic 0.0075 -       
+## White    0.0026 0.7310  
+## 
+## P value adjustment method: none</code></pre>
+</div>
+<div id="post-hoc-test-for-search-rate" class="section level3">
+<h3>Post Hoc test for Search Rate</h3>
+<pre class="r"><code>pairwise.t.test(open_policing$search_rate,open_policing$driver_race,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  open_policing$search_rate and open_policing$driver_race 
+## 
+##          Black   Hispanic
+## Hispanic 0.28    -       
+## White    1.2e-09 1.2e-12 
+## 
+## P value adjustment method: none</code></pre>
+</div>
+<div id="post-hoc-test-for-consent-search-rate" class="section level3">
+<h3>Post Hoc test for Consent Search Rate</h3>
+<pre class="r"><code>pairwise.t.test(open_policing$consent_search_rate,open_policing$driver_race,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  open_policing$consent_search_rate and open_policing$driver_race 
+## 
+##          Black   Hispanic
+## Hispanic 0.17    -       
+## White    5.9e-07 2.7e-10 
+## 
+## P value adjustment method: none</code></pre>
+</div>
+<div id="post-hoc-test-for-arrest-rate" class="section level3">
+<h3>Post Hoc test for Arrest Rate</h3>
+<pre class="r"><code>pairwise.t.test(open_policing$arrest_rate,open_policing$driver_race,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  open_policing$arrest_rate and open_policing$driver_race 
+## 
+##          Black   Hispanic
+## Hispanic 1.7e-11 -       
+## White    7.3e-06 &lt; 2e-16 
+## 
+## P value adjustment method: none</code></pre>
+</div>
+<div id="discussion" class="section level3">
+<h3>Discussion</h3>
+<div id="in-total-21-tests-were-performed-1-manova-5-anova-and-15-post-hoc-t-tests.-0.0521-0.002380952-which-is-the-new-level-of-significance-that-we-will-be-looking-at." class="section level4">
+<h4>In total, 21 tests were performed; 1 MANOVA, 5 ANOVA, and 15 post hoc t tests. 0.05/21 = 0.002380952, which is the new level of significance that we will be looking at.</h4>
+</div>
+<div id="the-manova-test-results-show-significancep-val-2.2e-16-so-we-should-look-at-individual-anovas-for-each-numerical-variable-against-driver_race-to-look-for-significance-between-those-groups." class="section level4">
+<h4>The MANOVA test results show significance(p val = 2.2e-16), so we should look at individual ANOVA’s for each numerical variable against driver_race to look for significance between those groups.</h4>
+</div>
+<div id="an-anova-test-for-each-of-the-5-numerical-variables-showed-significant-except-one-variable-stop_rate.-3-post-hoc-tests-where-then-ran-for-each-of-the-5-numerical-variables-tested-to-see-which-groups-are-significant-whithin-that-numerical-variable.-but-we-only-look-at-4-of-the-numerical-variables-since-one-of-them-is-not-statistically-significant." class="section level4">
+<h4>An ANOVA test for each of the 5 numerical variables showed significant except one variable, stop_rate. 3 post hoc tests where then ran for each of the 5 numerical variables tested to see which groups are significant whithin that numerical variable. But we only look at 4 of the numerical variables since one of them is not statistically significant.</h4>
+</div>
+<div id="in-stops_per_year-there-was-significance-seem-between-whites-and-blacks-and-whites-and-hispanics." class="section level4">
+<h4>In stops_per_year, there was significance seem between Whites and Blacks and Whites and Hispanics.</h4>
+</div>
+<div id="in-search_rate-there-was-significance-seem-between-whites-and-blacks-and-whites-and-hispanics." class="section level4">
+<h4>In search_rate, there was significance seem between Whites and Blacks and Whites and Hispanics.</h4>
+</div>
+<div id="in-consent_search_rate-there-was-significance-seem-between-whites-and-blacks-and-whites-and-hispanics." class="section level4">
+<h4>In consent_search_rate, there was significance seem between Whites and Blacks and Whites and Hispanics.</h4>
+</div>
+<div id="in-arrest_rate-there-was-significance-seem-between-whites-and-blacks-and-whites-and-hispanics-and-blacks-and-hispanics." class="section level4">
+<h4>In arrest_rate, there was significance seem between Whites and Blacks and Whites and Hispanics and Blacks and Hispanics.</h4>
+</div>
+<div id="in-regards-to-the-assumptions-of-the-manova-they-most-likely-have-been-met-but-there-is-a-possibility-that-they-werent.-this-is-because-the-data-that-was-collected-by-the-project-was-a-compilation-of-all-the-data-that-the-project-could-get-and-not-random-samples-within-all-the-traffic-stops-that-were-recorded-by-the-state.-the-results-of-the-post-hoc-tests-do-show-that-a-lot-of-the-results-show-significance-of-the-numerical-variables-towards-whites-versus-blacks-and-hispanics-which-may-show-that-there-is-some-unnormality-in-the-data.-but-there-doesnt-seem-to-be-any-extreme-outliers-or-extreme-multicollinearity-between-any-of-the-variables." class="section level4">
+<h4>In regards to the assumptions of the MANOVA, they most likely have been met, but there is a possibility that they weren’t. This is because the data that was collected by the project was a compilation of all the data that the project could get, and not random samples within all the traffic stops that were recorded by the state. The results of the post hoc tests do show that a lot of the results show significance of the numerical variables towards Whites versus Blacks and Hispanics which may show that there is some unnormality in the data. But there doesn’t seem to be any extreme outliers or extreme multicollinearity between any of the variables.</h4>
+</div>
+</div>
+</div>
+<div id="randomization-test" class="section level2">
+<h2>2) Randomization Test</h2>
+<div id="finding-mean-of-distribution" class="section level3">
+<h3>Finding Mean of Distribution</h3>
+<pre class="r"><code>open_policing%&gt;%group_by(consent_search_bin)%&gt;%summarize(m=mean(arrest_rate))%&gt;%summarize(diff(m))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `diff(m)`
+##       &lt;dbl&gt;
+## 1   0.00509</code></pre>
+</div>
+<div id="random-distribution-and-p-value-result" class="section level3">
+<h3>Random Distribution and p value Result</h3>
+<pre class="r"><code>rand_dist&lt;-vector()
+for(i in 1:5000){
+new&lt;-data.frame(arrestrate=sample(open_policing$arrest_rate),consentsearchratebin=open_policing$consent_search_bin)
+rand_dist[i]&lt;-mean(new[new$consentsearchratebin==&quot;1&quot;,]$arrestrate)-
+mean(new[new$consentsearchratebin==&quot;0&quot;,]$arrestrate)
+}
+
+mean(rand_dist &gt; 0.005091409)*2 #pvalue</code></pre>
+<pre><code>## [1] 0.034</code></pre>
+</div>
+<div id="visualization-of-the-random-distribution" class="section level3">
+<h3>Visualization of the Random Distribution</h3>
+<pre class="r"><code>{hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = 0.005091409    ,col=&quot;red&quot;)}</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="discussion-1" class="section level3">
+<h3>Discussion</h3>
+<div id="i-wanted-to-see-if-there-was-a-statistical-significance-between-arrest-rate-and-consent-to-search-rate.-i-used-the-binary-version-of-the-consent-to-stop-rate-to-run-this-randomization-test." class="section level4">
+<h4>I wanted to see if there was a statistical significance between arrest rate and consent to search rate. I used the binary version of the consent to stop rate to run this randomization test.</h4>
+</div>
+<div id="ho-mean-arrest-rate-to-of-drivers-is-the-same-for-consent-vs.non-consent-searches" class="section level4">
+<h4>Ho : mean arrest rate to of drivers is the same for consent vs. non-consent searches</h4>
+</div>
+<div id="ha-mean-arrest-rate-to-of-drivers-is-different-for-consent-vs.non-consent-searches" class="section level4">
+<h4>Ha : mean arrest rate to of drivers is different for consent vs. non-consent searches</h4>
+</div>
+<div id="the-results-of-the-randomization-tests-show-that-the-model-is-mostly-normal-with-a-slight-skew-towards-the-lower-values.-there-is-a-great-enough-difference-in-the-means-that-shows-that-there-is-a-significant-difference-between-the-arrest-rates-of-drivers-that-had-or-didnt-have-consented-searches.-this-was-verified-with-the-p-value-of-0.0328-which-is-0.05.-the-line-of-the-mean-in-the-histogramshown-in-red-also-shows-the-mean-far-away-from-the-mean-of-the-distribution-further-arguing-for-the-significance." class="section level4">
+<h4>The results of the randomization tests show that the model is mostly normal with a slight skew towards the lower values. There is a great enough difference in the means that shows that there is a significant difference between the arrest rates of drivers that had or didn’t have consented searches. This was verified with the p value of 0.0328 which is &lt; 0.05. The line of the mean in the histogram(shown in red) also shows the mean far away from the mean of the distribution, further arguing for the significance.</h4>
+</div>
+</div>
+</div>
+<div id="linear-regression-model" class="section level2">
+<h2>3) Linear Regression Model</h2>
+<div id="interpret-coefficient-estimates" class="section level3">
+<h3>Interpret Coefficient Estimates</h3>
+<pre class="r"><code>open_policing$stop_rate_c &lt;- open_policing$stop_rate - mean(open_policing$stop_rate)
+fit_3&lt;-lm(arrest_rate ~ consent_search_cat*stop_rate_c, data=open_policing)
+summary(fit_3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = arrest_rate ~ consent_search_cat * stop_rate_c, 
+##     data = open_policing)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.033275 -0.017784 -0.008089  0.008261  0.171565 
+## 
+## Coefficients:
+##                                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                        0.0280696  0.0020211  13.888   &lt;2e-16 ***
+## consent_search_catyes              0.0046618  0.0024761   1.883   0.0602 .  
+## stop_rate_c                       -0.0011040  0.0009124  -1.210   0.2268    
+## consent_search_catyes:stop_rate_c -0.0024267  0.0024254  -1.001   0.3175    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0283 on 590 degrees of freedom
+## Multiple R-squared:  0.0137, Adjusted R-squared:  0.008681 
+## F-statistic: 2.731 on 3 and 590 DF,  p-value: 0.04313</code></pre>
+<div id="when-stop_rate_c-increases-by-1-on-average-the-arrest_rate-decreases-by" class="section level4">
+<h4>When stop_rate_c increases by 1, on average, the arrest_rate decreases by</h4>
+<p>0.0011040. When a search is executed with consent, on average, the arrest_rate
+increases by 0.0046618. Assuming there is consent to search, the effect of the
+stop_rate is lesser by -0.0024267 compared to there being no stop.</p>
+</div>
+</div>
+<div id="plot-regression" class="section level3">
+<h3>Plot Regression</h3>
+<pre class="r"><code>ggplot(open_policing, aes(x=stop_rate, y=arrest_rate,group=consent_search_cat))+geom_point(aes(color=consent_search_cat))+
+geom_smooth(method=&quot;lm&quot;,se=F,fullrange=T,aes(color=consent_search_cat))+
+theme(legend.position=c(.9,.19))+xlab(&quot;&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="check-assumptions" class="section level3">
+<h3>Check Assumptions</h3>
+<pre class="r"><code>resids&lt;-fit_3$residuals
+fitvals&lt;-fit_3$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>ggplot()+geom_histogram(aes(resids), bins=20)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(open_policing,aes(stop_rate,arrest_rate,color=consent_search_cat))+geom_point()</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-16-3.png" width="672" /></p>
+</div>
+<div id="regression-results-with-robust-standard-error" class="section level3">
+<h3>Regression Results with Robust Standard Error</h3>
+<pre class="r"><code>coeftest(fit_3, vcov = vcovHC(fit_3))[,1:2]</code></pre>
+<pre><code>##                                       Estimate  Std. Error
+## (Intercept)                        0.028069625 0.002587965
+## consent_search_catyes              0.004661783 0.002842918
+## stop_rate_c                       -0.001103971 0.002490565
+## consent_search_catyes:stop_rate_c -0.002426686 0.002696296</code></pre>
+<pre class="r"><code>coeftest(fit_3)[,1:2]</code></pre>
+<pre><code>##                                       Estimate   Std. Error
+## (Intercept)                        0.028069625 0.0020211369
+## consent_search_catyes              0.004661783 0.0024760553
+## stop_rate_c                       -0.001103971 0.0009124088
+## consent_search_catyes:stop_rate_c -0.002426686 0.0024254340</code></pre>
+<div id="overall-the-standard-errors-before-and-after-robust-adjustments-were-near-identical-except-for-the-stop_rate_c-variable.-the-robust-adjustment-increased-the-standard-error-making-the-p-value-for-that-variable-greater-reducing-that-variables-chance-of-being-statistically-significant." class="section level4">
+<h4>Overall, the standard errors before and after robust adjustments were near identical except for the stop_rate_c variable. The robust adjustment increased the standard error, making the p value for that variable greater, reducing that variables chance of being statistically significant.</h4>
+</div>
+</div>
+<div id="proportion-of-variance-in-outcome-explained-by-model" class="section level3">
+<h3>Proportion of Variance in Outcome Explained by Model</h3>
+<pre class="r"><code>summary(fit_3)$r.sq</code></pre>
+<pre><code>## [1] 0.01369648</code></pre>
+<div id="the-proportion-of-the-variation-in-the-outcome-that-my-model-explains-is-0.01369648." class="section level4">
+<h4>The proportion of the variation in the outcome that my model explains is 0.01369648.</h4>
+</div>
+</div>
+<div id="rerun-the-regression-but-without-interactions" class="section level3">
+<h3>Rerun the Regression but without Interactions</h3>
+<pre class="r"><code>fit_4&lt;-lm(arrest_rate ~ consent_search_cat + stop_rate_c, data=open_policing)
+summary(fit_4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = arrest_rate ~ consent_search_cat + stop_rate_c, 
+##     data = open_policing)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.033110 -0.017775 -0.008275  0.008330  0.171400 
+## 
+## Coefficients:
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)            0.0281213  0.0020205  13.918   &lt;2e-16 ***
+## consent_search_catyes  0.0047656  0.0024739   1.926   0.0545 .  
+## stop_rate_c           -0.0014474  0.0008454  -1.712   0.0874 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.0283 on 591 degrees of freedom
+## Multiple R-squared:  0.01202,    Adjusted R-squared:  0.00868 
+## F-statistic: 3.596 on 2 and 591 DF,  p-value: 0.02803</code></pre>
+</div>
+</div>
+<div id="bootstrapped-standard-errors" class="section level2">
+<h2>4) Bootstrapped Standard Errors</h2>
+<pre class="r"><code>coeftest(fit_3)[,1:2]</code></pre>
+<pre><code>##                                       Estimate   Std. Error
+## (Intercept)                        0.028069625 0.0020211369
+## consent_search_catyes              0.004661783 0.0024760553
+## stop_rate_c                       -0.001103971 0.0009124088
+## consent_search_catyes:stop_rate_c -0.002426686 0.0024254340</code></pre>
+<pre class="r"><code>samp_distn&lt;-replicate(5000, {
+boot_dat&lt;-open_policing[sample(nrow(open_policing),replace=TRUE),]
+fit_boot&lt;-lm(arrest_rate ~ consent_search_cat*stop_rate_c,data=boot_dat)
+coef(fit_boot)
+})
+samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept) consent_search_catyes stop_rate_c
+## 1 0.002600338           0.002830064 0.004028053
+##   consent_search_catyes:stop_rate_c
+## 1                       0.004295388</code></pre>
+<div id="all-of-the-standard-errors-original-robust-and-bootstrap-have-extremely-similar-standard-errors-for-consent_search_catyes-and-consent_search_catyesstop_rate_c.-the-stop_rate_c-is-the-variable-that-have-varying-standard-errors-across-the-three-different-standard-error-measurements.-the-original-standard-error-had-a-much-lower-standard-error-and-the-bootstrapped-standard-error-had-a-greater-standard-error-which-the-robust-standard-error-staying-around-0.002.-the-original-standard-error-for-stop_rate_c-would-have-a-lower-p-value-than-the-robust-and-bootstrapped-standard-errors-and-the-bootstrapped-standard-errors-would-have-a-higher-p-value-than-the-robust-and-original-standard-errors." class="section level4">
+<h4>All of the standard errors (original, robust, and bootstrap) have extremely similar standard errors for consent_search_catyes and consent_search_catyes:stop_rate_c. The stop_rate_c is the variable that have varying standard errors across the three different standard error measurements. The original standard error had a much lower standard error and the bootstrapped standard error had a greater standard error, which the robust standard error staying around ~ 0.002. The original standard error for stop_rate_c would have a lower p value than the robust and bootstrapped standard errors, and the bootstrapped standard errors would have a higher p value than the robust and original standard errors.</h4>
+</div>
+</div>
+<div id="logistic-regression-model" class="section level2">
+<h2>5) Logistic Regression Model</h2>
+<div id="interpret-coeeficient-estimates" class="section level3">
+<h3>Interpret Coeeficient Estimates</h3>
+<pre class="r"><code>fit_5&lt;-glm(consent_search_bin~stops_per_year+stop_rate,data=open_policing,family=binomial(link=&quot;logit&quot;))
+
+coeftest(fit_5)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                   Estimate  Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)     5.8475e-01  1.1188e-01  5.2266 1.726e-07 ***
+## stops_per_year  4.5829e-05  1.9649e-05  2.3324   0.01968 *  
+## stop_rate      -1.1041e-01  8.4563e-02 -1.3057   0.19167    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>coef(fit_5)%&gt;%round(3)%&gt;%data.frame</code></pre>
+<pre><code>##                     .
+## (Intercept)     0.585
+## stops_per_year  0.000
+## stop_rate      -0.110</code></pre>
+<pre class="r"><code>exp(coef(fit_5))%&gt;%round(3)%&gt;%data.frame</code></pre>
+<pre><code>##                    .
+## (Intercept)    1.795
+## stops_per_year 1.000
+## stop_rate      0.895</code></pre>
+<div id="with-every-one-unit-increase-in-stop_rate-the-odds-of-having-a-search-with-consent-multiplies-by-0.895.-with-every-one-unit-increase-in-stops_per_year-the-odds-of-having-a-search-with-consent-multiplies-by-1.000." class="section level4">
+<h4>With every one unit increase in stop_rate, the odds of having a search with consent multiplies by 0.895. With every one unit increase in stops_per_year, the odds of having a search with consent multiplies by 1.000.</h4>
+</div>
+</div>
+<div id="report-confusin-matrix" class="section level3">
+<h3>Report Confusin Matrix</h3>
+<pre class="r"><code>prob&lt;-predict(fit_5,type=&quot;response&quot;)
+pred&lt;-ifelse(prob&gt;.5,1,0)
+table(truth=open_policing$consent_search_bin, prediction=pred)%&gt;%addmargins</code></pre>
+<pre><code>##      prediction
+## truth   0   1 Sum
+##   0     2 195 197
+##   1     1 396 397
+##   Sum   3 591 594</code></pre>
+</div>
+<div id="accuracy-sensitivity-specificity-recall" class="section level3">
+<h3>Accuracy, Sensitivity, Specificity, Recall</h3>
+<pre class="r"><code># Accuracy
+(396+2)/594</code></pre>
+<pre><code>## [1] 0.6700337</code></pre>
+<pre class="r"><code># Sensitivity (TPR)
+396/397</code></pre>
+<pre><code>## [1] 0.9974811</code></pre>
+<pre class="r"><code># Specificity (TNR)
+2/3</code></pre>
+<pre><code>## [1] 0.6666667</code></pre>
+<pre class="r"><code># Recall
+396/591</code></pre>
+<pre><code>## [1] 0.6700508</code></pre>
+<div id="the-accucary-was-seen-to-be-0.9974811-the-sensitivity-0.6700508-the-specificity-0.6666667-and-the-recall-0.6700337.-overall-the-sensitivity-of-the-model-was-really-high-but-the-overall-precision-and-accuracy-wasnt-nearly-the-same." class="section level4">
+<h4>The accucary was seen to be 0.9974811, the sensitivity 0.6700508, the specificity 0.6666667, and the recall 0.6700337. Overall, the sensitivity of the model was really high, but the overall precision and accuracy wasn’t nearly the same.</h4>
+</div>
+</div>
+<div id="plot-density-of-log-odds-by-binary-outcome-variable" class="section level3">
+<h3>Plot Density of log-odds by Binary Outcome Variable</h3>
+<pre class="r"><code>pca1&lt;-princomp(open_policing[c(&#39;stop_rate&#39;,&#39;stops_per_year&#39;)])
+open_policing$predictor&lt;-pca1$scores[,1]
+
+fit_6&lt;-glm(consent_search_bin~predictor,data=open_policing,family=&quot;binomial&quot;)
+open_policing$prob&lt;-predict(fit_6,type=&quot;response&quot;)
+
+open_policing$logit &lt;- predict(fit_5)
+
+ggplot(open_policing, aes(logit, fill = consent_search_cat)) + geom_density(alpha = 0.3) + geom_vline(xintercept = 0, lty = 2)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+<div id="roc-curve-and-auc" class="section level3">
+<h3>ROC Curve and AUC</h3>
+<pre class="r"><code>sens&lt;-function(p,data=open_policing, y=consent_search_bin)mean(open_policing[open_policing$consent_search_bin==1,]$prob&gt;p)
+spec&lt;-function(p,data=open_policing, y=consent_search_bin)mean(open_policing[open_policing$consent_search_bin==0,]$prob&lt;p)
+
+sensitivity&lt;-sapply(seq(0,1,.01),sens, open_policing)
+specificity&lt;-sapply(seq(0,1,.01),spec, open_policing)
+
+ROC1&lt;-data.frame(sensitivity,specificity,cutoff=seq(0,1,.01))
+
+ROC1$TPR&lt;-sensitivity
+ROC1$FPR&lt;-1-specificity
+
+ROC1%&gt;%ggplot(aes(FPR,TPR))+geom_path(size=1.5)+geom_segment(aes(x=0,y=0,xend=1,yend=1),
+lty=2)+
+scale_x_continuous(limits = c(0,1))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+</div>
+<div id="c10-fold-cv-and-report-accuracy-sensitivity-and-recall" class="section level3">
+<h3>C10-fold CV and Report Accuracy, Sensitivity, and Recall</h3>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+
+ord&lt;-order(probs, decreasing=TRUE)
+probs &lt;- probs[ord]; truth &lt;- truth[ord]
+TPR=cumsum(truth)/max(1,sum(truth))
+FPR=cumsum(!truth)/max(1,sum(!truth))
+dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+n &lt;- length(TPR)
+auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+data.frame(acc,sens,spec,ppv,auc)}</code></pre>
+<pre class="r"><code>set.seed(1234)
+k=10
+data_5&lt;-open_policing[sample(nrow(open_policing)),]
+folds&lt;-cut(seq(1:nrow(open_policing)),breaks=k,labels=F)
+diags&lt;-NULL
+for(i in 1:k){
+train_5&lt;-data_5[folds!=i,]
+test_5&lt;-data_5[folds==i,]
+truth_5&lt;-test_5$consent_search_bin
+
+fit_7&lt;-glm(consent_search_bin~stops_per_year+stop_rate,data=train_5,family=&quot;binomial&quot;)
+probs_5&lt;-predict(fit_7,newdata = test_5,type=&quot;response&quot;)
+
+diags&lt;-rbind(diags,class_diag(probs_5,truth_5))
+}
+
+apply(diags,2,mean)</code></pre>
+<pre><code>##        acc       sens       spec        ppv        auc 
+## 0.66827684 0.99478320 0.00819398 0.66911942 0.59093790</code></pre>
+</div>
+</div>
+<div id="lasso-regression" class="section level2">
+<h2>6) LASSO Regression</h2>
+<pre class="r"><code>open_policing$location &lt;- factor(open_policing$location)
+open_policing$state &lt;- factor(open_policing$state)
+open_policing$driver_race &lt;- factor(open_policing$driver_race)
+open_policing$consent_search_cat &lt;- factor(open_policing$consent_search_cat)
+
+fit_lasso &lt;- glm(consent_search_bin ~ -1 + location + state + driver_race + stops_per_year + stop_rate + search_rate + consent_search_rate + arrest_rate, data = open_policing,
+family = &quot;binomial&quot;)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>model.matrix(fit_lasso) %&gt;% head()</code></pre>
+<pre><code>##   locationA1 locationA2 locationA3 locationA4 locationA5 locationA6 locationA7
+## 1          0          0          0          0          0          0          0
+## 2          0          0          0          0          0          0          0
+## 3          0          0          0          0          0          0          0
+## 4          0          0          0          0          0          0          0
+## 5          0          0          0          0          0          0          0
+## 6          0          0          0          0          0          0          0
+##   locationA8 locationADAMS COUNTY locationALACHUA COUNTY locationALAMOSA COUNTY
+## 1          0                    1                      0                      0
+## 2          0                    1                      0                      0
+## 3          0                    1                      0                      0
+## 4          0                    0                      0                      1
+## 5          0                    0                      0                      1
+## 6          0                    0                      0                      1
+##   locationARAPAHOE COUNTY locationARCHULETA COUNTY locationB2 locationB3
+## 1                       0                        0          0          0
+## 2                       0                        0          0          0
+## 3                       0                        0          0          0
+## 4                       0                        0          0          0
+## 5                       0                        0          0          0
+## 6                       0                        0          0          0
+##   locationB4 locationB5 locationB6 locationB7 locationB8 locationBACA COUNTY
+## 1          0          0          0          0          0                   0
+## 2          0          0          0          0          0                   0
+## 3          0          0          0          0          0                   0
+## 4          0          0          0          0          0                   0
+## 5          0          0          0          0          0                   0
+## 6          0          0          0          0          0                   0
+##   locationBAKER COUNTY locationBARNSTABLE COUNTY locationBAY COUNTY
+## 1                    0                         0                  0
+## 2                    0                         0                  0
+## 3                    0                         0                  0
+## 4                    0                         0                  0
+## 5                    0                         0                  0
+## 6                    0                         0                  0
+##   locationBENT COUNTY locationBERKSHIRE COUNTY locationBOULDER COUNTY
+## 1                   0                        0                      0
+## 2                   0                        0                      0
+## 3                   0                        0                      0
+## 4                   0                        0                      0
+## 5                   0                        0                      0
+## 6                   0                        0                      0
+##   locationBRADFORD COUNTY locationBREVARD COUNTY locationBRISTOL COUNTY
+## 1                       0                      0                      0
+## 2                       0                      0                      0
+## 3                       0                      0                      0
+## 4                       0                      0                      0
+## 5                       0                      0                      0
+## 6                       0                      0                      0
+##   locationBROOMFIELD COUNTY locationBROWARD COUNTY locationC1 locationC2
+## 1                         0                      0          0          0
+## 2                         0                      0          0          0
+## 3                         0                      0          0          0
+## 4                         0                      0          0          0
+## 5                         0                      0          0          0
+## 6                         0                      0          0          0
+##   locationC3 locationC4 locationC5 locationC6 locationC7 locationC8
+## 1          0          0          0          0          0          0
+## 2          0          0          0          0          0          0
+## 3          0          0          0          0          0          0
+## 4          0          0          0          0          0          0
+## 5          0          0          0          0          0          0
+## 6          0          0          0          0          0          0
+##   locationCALHOUN COUNTY locationCHAFFEE COUNTY locationCHARLOTTE COUNTY
+## 1                      0                      0                        0
+## 2                      0                      0                        0
+## 3                      0                      0                        0
+## 4                      0                      0                        0
+## 5                      0                      0                        0
+## 6                      0                      0                        0
+##   locationCHEYENNE COUNTY locationCITRUS COUNTY locationCLAY COUNTY
+## 1                       0                     0                   0
+## 2                       0                     0                   0
+## 3                       0                     0                   0
+## 4                       0                     0                   0
+## 5                       0                     0                   0
+## 6                       0                     0                   0
+##   locationCLEAR CREEK COUNTY locationCOLLIER COUNTY locationCOLUMBIA COUNTY
+## 1                          0                      0                       0
+## 2                          0                      0                       0
+## 3                          0                      0                       0
+## 4                          0                      0                       0
+## 5                          0                      0                       0
+## 6                          0                      0                       0
+##   locationCONEJOS COUNTY locationCOSTILLA COUNTY locationCROWLEY COUNTY
+## 1                      0                       0                      0
+## 2                      0                       0                      0
+## 3                      0                       0                      0
+## 4                      0                       0                      0
+## 5                      0                       0                      0
+## 6                      0                       0                      0
+##   locationCUSTER COUNTY locationD1 locationD2 locationD3 locationD4 locationD5
+## 1                     0          0          0          0          0          0
+## 2                     0          0          0          0          0          0
+## 3                     0          0          0          0          0          0
+## 4                     0          0          0          0          0          0
+## 5                     0          0          0          0          0          0
+## 6                     0          0          0          0          0          0
+##   locationD6 locationD7 locationDELTA COUNTY locationDENVER COUNTY
+## 1          0          0                    0                     0
+## 2          0          0                    0                     0
+## 3          0          0                    0                     0
+## 4          0          0                    0                     0
+## 5          0          0                    0                     0
+## 6          0          0                    0                     0
+##   locationDESOTO COUNTY locationDIXIE COUNTY locationDOLORES COUNTY
+## 1                     0                    0                      0
+## 2                     0                    0                      0
+## 3                     0                    0                      0
+## 4                     0                    0                      0
+## 5                     0                    0                      0
+## 6                     0                    0                      0
+##   locationDOUGLAS COUNTY locationDUKES COUNTY locationDUVAL COUNTY locationE1
+## 1                      0                    0                    0          0
+## 2                      0                    0                    0          0
+## 3                      0                    0                    0          0
+## 4                      0                    0                    0          0
+## 5                      0                    0                    0          0
+## 6                      0                    0                    0          0
+##   locationE2 locationE3 locationE4 locationE5 locationE6 locationE7
+## 1          0          0          0          0          0          0
+## 2          0          0          0          0          0          0
+## 3          0          0          0          0          0          0
+## 4          0          0          0          0          0          0
+## 5          0          0          0          0          0          0
+## 6          0          0          0          0          0          0
+##   locationEAGLE COUNTY locationEL PASO COUNTY locationELBERT COUNTY
+## 1                    0                      0                     0
+## 2                    0                      0                     0
+## 3                    0                      0                     0
+## 4                    0                      0                     0
+## 5                    0                      0                     0
+## 6                    0                      0                     0
+##   locationESCAMBIA COUNTY locationESSEX COUNTY locationF1 locationF2 locationF3
+## 1                       0                    0          0          0          0
+## 2                       0                    0          0          0          0
+## 3                       0                    0          0          0          0
+## 4                       0                    0          0          0          0
+## 5                       0                    0          0          0          0
+## 6                       0                    0          0          0          0
+##   locationF4 locationF5 locationFLAGLER COUNTY locationFRANKLIN COUNTY
+## 1          0          0                      0                       0
+## 2          0          0                      0                       0
+## 3          0          0                      0                       0
+## 4          0          0                      0                       0
+## 5          0          0                      0                       0
+## 6          0          0                      0                       0
+##   locationFREMONT COUNTY locationG1 locationG2 locationG3 locationG4 locationG5
+## 1                      0          0          0          0          0          0
+## 2                      0          0          0          0          0          0
+## 3                      0          0          0          0          0          0
+## 4                      0          0          0          0          0          0
+## 5                      0          0          0          0          0          0
+## 6                      0          0          0          0          0          0
+##   locationG6 locationGADSDEN COUNTY locationGARFIELD COUNTY
+## 1          0                      0                       0
+## 2          0                      0                       0
+## 3          0                      0                       0
+## 4          0                      0                       0
+## 5          0                      0                       0
+## 6          0                      0                       0
+##   locationGILCHRIST COUNTY locationGILPIN COUNTY locationGLADES COUNTY
+## 1                        0                     0                     0
+## 2                        0                     0                     0
+## 3                        0                     0                     0
+## 4                        0                     0                     0
+## 5                        0                     0                     0
+## 6                        0                     0                     0
+##   locationGRAND COUNTY locationGULF COUNTY locationGUNNISON COUNTY locationH1
+## 1                    0                   0                       0          0
+## 2                    0                   0                       0          0
+## 3                    0                   0                       0          0
+## 4                    0                   0                       0          0
+## 5                    0                   0                       0          0
+## 6                    0                   0                       0          0
+##   locationH2 locationH3 locationH4 locationH5 locationH6
+## 1          0          0          0          0          0
+## 2          0          0          0          0          0
+## 3          0          0          0          0          0
+## 4          0          0          0          0          0
+## 5          0          0          0          0          0
+## 6          0          0          0          0          0
+##   locationHAMILTON COUNTY locationHAMPDEN COUNTY locationHAMPSHIRE COUNTY
+## 1                       0                      0                        0
+## 2                       0                      0                        0
+## 3                       0                      0                        0
+## 4                       0                      0                        0
+## 5                       0                      0                        0
+## 6                       0                      0                        0
+##   locationHARDEE COUNTY locationHENDRY COUNTY locationHERNANDO COUNTY
+## 1                     0                     0                       0
+## 2                     0                     0                       0
+## 3                     0                     0                       0
+## 4                     0                     0                       0
+## 5                     0                     0                       0
+## 6                     0                     0                       0
+##   locationHIGHLANDS COUNTY locationHILLSBOROUGH COUNTY locationHINSDALE COUNTY
+## 1                        0                           0                       0
+## 2                        0                           0                       0
+## 3                        0                           0                       0
+## 4                        0                           0                       0
+## 5                        0                           0                       0
+## 6                        0                           0                       0
+##   locationHOLMES COUNTY locationHUERFANO COUNTY locationINDIAN RIVER COUNTY
+## 1                     0                       0                           0
+## 2                     0                       0                           0
+## 3                     0                       0                           0
+## 4                     0                       0                           0
+## 5                     0                       0                           0
+## 6                     0                       0                           0
+##   locationJACKSON COUNTY locationJEFFERSON COUNTY locationKIOWA COUNTY
+## 1                      0                        0                    0
+## 2                      0                        0                    0
+## 3                      0                        0                    0
+## 4                      0                        0                    0
+## 5                      0                        0                    0
+## 6                      0                        0                    0
+##   locationKIT CARSON COUNTY locationLA PLATA COUNTY locationLAFAYETTE COUNTY
+## 1                         0                       0                        0
+## 2                         0                       0                        0
+## 3                         0                       0                        0
+## 4                         0                       0                        0
+## 5                         0                       0                        0
+## 6                         0                       0                        0
+##   locationLAKE COUNTY locationLARIMER COUNTY locationLAS ANIMAS COUNTY
+## 1                   0                      0                         0
+## 2                   0                      0                         0
+## 3                   0                      0                         0
+## 4                   0                      0                         0
+## 5                   0                      0                         0
+## 6                   0                      0                         0
+##   locationLEE COUNTY locationLEON COUNTY locationLEVY COUNTY
+## 1                  0                   0                   0
+## 2                  0                   0                   0
+## 3                  0                   0                   0
+## 4                  0                   0                   0
+## 5                  0                   0                   0
+## 6                  0                   0                   0
+##   locationLIBERTY COUNTY locationLINCOLN COUNTY locationLOGAN COUNTY
+## 1                      0                      0                    0
+## 2                      0                      0                    0
+## 3                      0                      0                    0
+## 4                      0                      0                    0
+## 5                      0                      0                    0
+## 6                      0                      0                    0
+##   locationMADISON COUNTY locationMANATEE COUNTY locationMARION COUNTY
+## 1                      0                      0                     0
+## 2                      0                      0                     0
+## 3                      0                      0                     0
+## 4                      0                      0                     0
+## 5                      0                      0                     0
+## 6                      0                      0                     0
+##   locationMARTIN COUNTY locationMESA COUNTY locationMIAMI-DADE COUNTY
+## 1                     0                   0                         0
+## 2                     0                   0                         0
+## 3                     0                   0                         0
+## 4                     0                   0                         0
+## 5                     0                   0                         0
+## 6                     0                   0                         0
+##   locationMIDDLESEX COUNTY locationMINERAL COUNTY locationMOFFAT COUNTY
+## 1                        0                      0                     0
+## 2                        0                      0                     0
+## 3                        0                      0                     0
+## 4                        0                      0                     0
+## 5                        0                      0                     0
+## 6                        0                      0                     0
+##   locationMONROE COUNTY locationMONTEZUMA COUNTY locationMONTROSE COUNTY
+## 1                     0                        0                       0
+## 2                     0                        0                       0
+## 3                     0                        0                       0
+## 4                     0                        0                       0
+## 5                     0                        0                       0
+## 6                     0                        0                       0
+##   locationMORGAN COUNTY locationNANTUCKET COUNTY locationNASSAU COUNTY
+## 1                     0                        0                     0
+## 2                     0                        0                     0
+## 3                     0                        0                     0
+## 4                     0                        0                     0
+## 5                     0                        0                     0
+## 6                     0                        0                     0
+##   locationNORFOLK COUNTY locationOKALOOSA COUNTY locationOKEECHOBEE COUNTY
+## 1                      0                       0                         0
+## 2                      0                       0                         0
+## 3                      0                       0                         0
+## 4                      0                       0                         0
+## 5                      0                       0                         0
+## 6                      0                       0                         0
+##   locationORANGE COUNTY locationOSCEOLA COUNTY locationOTERO COUNTY
+## 1                     0                      0                    0
+## 2                     0                      0                    0
+## 3                     0                      0                    0
+## 4                     0                      0                    0
+## 5                     0                      0                    0
+## 6                     0                      0                    0
+##   locationOURAY COUNTY locationPALM BEACH COUNTY locationPARK COUNTY
+## 1                    0                         0                   0
+## 2                    0                         0                   0
+## 3                    0                         0                   0
+## 4                    0                         0                   0
+## 5                    0                         0                   0
+## 6                    0                         0                   0
+##   locationPASCO COUNTY locationPHILLIPS COUNTY locationPINELLAS COUNTY
+## 1                    0                       0                       0
+## 2                    0                       0                       0
+## 3                    0                       0                       0
+## 4                    0                       0                       0
+## 5                    0                       0                       0
+## 6                    0                       0                       0
+##   locationPITKIN COUNTY locationPLYMOUTH COUNTY locationPOLK COUNTY
+## 1                     0                       0                   0
+## 2                     0                       0                   0
+## 3                     0                       0                   0
+## 4                     0                       0                   0
+## 5                     0                       0                   0
+## 6                     0                       0                   0
+##   locationPROWERS COUNTY locationPUEBLO COUNTY locationPUTNAM COUNTY
+## 1                      0                     0                     0
+## 2                      0                     0                     0
+## 3                      0                     0                     0
+## 4                      0                     0                     0
+## 5                      0                     0                     0
+## 6                      0                     0                     0
+##   locationRIO BLANCO COUNTY locationRIO GRANDE COUNTY locationROUTT COUNTY
+## 1                         0                         0                    0
+## 2                         0                         0                    0
+## 3                         0                         0                    0
+## 4                         0                         0                    0
+## 5                         0                         0                    0
+## 6                         0                         0                    0
+##   locationSAGUACHE COUNTY locationSAN JUAN COUNTY locationSAN MIGUEL COUNTY
+## 1                       0                       0                         0
+## 2                       0                       0                         0
+## 3                       0                       0                         0
+## 4                       0                       0                         0
+## 5                       0                       0                         0
+## 6                       0                       0                         0
+##   locationSANTA ROSA COUNTY locationSARASOTA COUNTY locationSEDGWICK COUNTY
+## 1                         0                       0                       0
+## 2                         0                       0                       0
+## 3                         0                       0                       0
+## 4                         0                       0                       0
+## 5                         0                       0                       0
+## 6                         0                       0                       0
+##   locationSEMINOLE COUNTY locationST. JOHNS COUNTY locationST. LUCIE COUNTY
+## 1                       0                        0                        0
+## 2                       0                        0                        0
+## 3                       0                        0                        0
+## 4                       0                        0                        0
+## 5                       0                        0                        0
+## 6                       0                        0                        0
+##   locationSUFFOLK COUNTY locationSUMMIT COUNTY locationSUMTER COUNTY
+## 1                      0                     0                     0
+## 2                      0                     0                     0
+## 3                      0                     0                     0
+## 4                      0                     0                     0
+## 5                      0                     0                     0
+## 6                      0                     0                     0
+##   locationSUWANNEE COUNTY locationTAYLOR COUNTY locationTELLER COUNTY
+## 1                       0                     0                     0
+## 2                       0                     0                     0
+## 3                       0                     0                     0
+## 4                       0                     0                     0
+## 5                       0                     0                     0
+## 6                       0                     0                     0
+##   locationUNION COUNTY locationVOLUSIA COUNTY locationWAKULLA COUNTY
+## 1                    0                      0                      0
+## 2                    0                      0                      0
+## 3                    0                      0                      0
+## 4                    0                      0                      0
+## 5                    0                      0                      0
+## 6                    0                      0                      0
+##   locationWALTON COUNTY locationWASHINGTON COUNTY locationWELD COUNTY
+## 1                     0                         0                   0
+## 2                     0                         0                   0
+## 3                     0                         0                   0
+## 4                     0                         0                   0
+## 5                     0                         0                   0
+## 6                     0                         0                   0
+##   locationWORCESTER COUNTY locationYUMA COUNTY stateFL stateMA stateNC
+## 1                        0                   0       0       0       0
+## 2                        0                   0       0       0       0
+## 3                        0                   0       0       0       0
+## 4                        0                   0       0       0       0
+## 5                        0                   0       0       0       0
+## 6                        0                   0       0       0       0
+##   driver_raceHispanic driver_raceWhite stops_per_year stop_rate search_rate
+## 1                   0                0            791     0.077       0.005
+## 2                   1                0           5913     0.048       0.003
+## 3                   0                1          13800     0.069       0.003
+## 4                   0                0             80     0.506       0.017
+## 5                   1                0           1598     0.296       0.009
+## 6                   0                1           2951     0.447       0.004
+##   consent_search_rate arrest_rate
+## 1               0.002       0.057
+## 2               0.001       0.071
+## 3               0.001       0.032
+## 4               0.010       0.093
+## 5               0.003       0.058
+## 6               0.001       0.034</code></pre>
+<pre class="r"><code>set.seed(1234)
+
+x&lt;-model.matrix(fit_lasso)
+x&lt;-scale(x)
+y&lt;-as.matrix(open_policing$consent_search_bin)
+
+cv&lt;-cv.glmnet(x,y,family=&#39;binomial&#39;)
+lasso&lt;-glmnet(x,y,family=&#39;binomial&#39;,lambda=cv$lambda.1se)
+coef(cv)</code></pre>
+<pre><code>## 205 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                                       1
+## (Intercept)                 19.83460791
+## locationA1                   .         
+## locationA2                   .         
+## locationA3                   .         
+## locationA4                   .         
+## locationA5                   .         
+## locationA6                   .         
+## locationA7                   .         
+## locationA8                   .         
+## locationADAMS COUNTY         .         
+## locationALACHUA COUNTY       .         
+## locationALAMOSA COUNTY       .         
+## locationARAPAHOE COUNTY      .         
+## locationARCHULETA COUNTY     .         
+## locationB2                   .         
+## locationB3                   .         
+## locationB4                   .         
+## locationB5                   .         
+## locationB6                   .         
+## locationB7                   .         
+## locationB8                   .         
+## locationBACA COUNTY          .         
+## locationBAKER COUNTY         .         
+## locationBARNSTABLE COUNTY    .         
+## locationBAY COUNTY           .         
+## locationBENT COUNTY          .         
+## locationBERKSHIRE COUNTY     .         
+## locationBOULDER COUNTY       .         
+## locationBRADFORD COUNTY      .         
+## locationBREVARD COUNTY       .         
+## locationBRISTOL COUNTY       .         
+## locationBROOMFIELD COUNTY    .         
+## locationBROWARD COUNTY       .         
+## locationC1                   .         
+## locationC2                   .         
+## locationC3                   .         
+## locationC4                   .         
+## locationC5                   .         
+## locationC6                   .         
+## locationC7                   .         
+## locationC8                   .         
+## locationCALHOUN COUNTY       .         
+## locationCHAFFEE COUNTY       .         
+## locationCHARLOTTE COUNTY     .         
+## locationCHEYENNE COUNTY      .         
+## locationCITRUS COUNTY        .         
+## locationCLAY COUNTY          .         
+## locationCLEAR CREEK COUNTY   .         
+## locationCOLLIER COUNTY       .         
+## locationCOLUMBIA COUNTY      .         
+## locationCONEJOS COUNTY       .         
+## locationCOSTILLA COUNTY      .         
+## locationCROWLEY COUNTY       .         
+## locationCUSTER COUNTY        .         
+## locationD1                   .         
+## locationD2                   .         
+## locationD3                   .         
+## locationD4                   .         
+## locationD5                   .         
+## locationD6                   .         
+## locationD7                   .         
+## locationDELTA COUNTY         .         
+## locationDENVER COUNTY        .         
+## locationDESOTO COUNTY        .         
+## locationDIXIE COUNTY         .         
+## locationDOLORES COUNTY       .         
+## locationDOUGLAS COUNTY       .         
+## locationDUKES COUNTY         .         
+## locationDUVAL COUNTY         .         
+## locationE1                   .         
+## locationE2                   .         
+## locationE3                   .         
+## locationE4                   .         
+## locationE5                   .         
+## locationE6                   .         
+## locationE7                   .         
+## locationEAGLE COUNTY         .         
+## locationEL PASO COUNTY       .         
+## locationELBERT COUNTY        .         
+## locationESCAMBIA COUNTY      .         
+## locationESSEX COUNTY         .         
+## locationF1                   .         
+## locationF2                   .         
+## locationF3                   .         
+## locationF4                   .         
+## locationF5                   .         
+## locationFLAGLER COUNTY       .         
+## locationFRANKLIN COUNTY      .         
+## locationFREMONT COUNTY       .         
+## locationG1                   .         
+## locationG2                   .         
+## locationG3                   .         
+## locationG4                   .         
+## locationG5                   .         
+## locationG6                   .         
+## locationGADSDEN COUNTY       .         
+## locationGARFIELD COUNTY      .         
+## locationGILCHRIST COUNTY     .         
+## locationGILPIN COUNTY        .         
+## locationGLADES COUNTY        .         
+## locationGRAND COUNTY         .         
+## locationGULF COUNTY          .         
+## locationGUNNISON COUNTY      .         
+## locationH1                   .         
+## locationH2                   .         
+## locationH3                   .         
+## locationH4                   .         
+## locationH5                   .         
+## locationH6                   .         
+## locationHAMILTON COUNTY      .         
+## locationHAMPDEN COUNTY       .         
+## locationHAMPSHIRE COUNTY     .         
+## locationHARDEE COUNTY        .         
+## locationHENDRY COUNTY        .         
+## locationHERNANDO COUNTY      .         
+## locationHIGHLANDS COUNTY     .         
+## locationHILLSBOROUGH COUNTY  .         
+## locationHINSDALE COUNTY      .         
+## locationHOLMES COUNTY        .         
+## locationHUERFANO COUNTY      .         
+## locationINDIAN RIVER COUNTY  .         
+## locationJACKSON COUNTY       .         
+## locationJEFFERSON COUNTY     .         
+## locationKIOWA COUNTY         .         
+## locationKIT CARSON COUNTY    .         
+## locationLA PLATA COUNTY      .         
+## locationLAFAYETTE COUNTY     .         
+## locationLAKE COUNTY          .         
+## locationLARIMER COUNTY       .         
+## locationLAS ANIMAS COUNTY    .         
+## locationLEE COUNTY           .         
+## locationLEON COUNTY          .         
+## locationLEVY COUNTY          .         
+## locationLIBERTY COUNTY       .         
+## locationLINCOLN COUNTY       .         
+## locationLOGAN COUNTY         .         
+## locationMADISON COUNTY       .         
+## locationMANATEE COUNTY       .         
+## locationMARION COUNTY        .         
+## locationMARTIN COUNTY        .         
+## locationMESA COUNTY          .         
+## locationMIAMI-DADE COUNTY    .         
+## locationMIDDLESEX COUNTY     .         
+## locationMINERAL COUNTY       .         
+## locationMOFFAT COUNTY        .         
+## locationMONROE COUNTY        .         
+## locationMONTEZUMA COUNTY     .         
+## locationMONTROSE COUNTY      .         
+## locationMORGAN COUNTY        .         
+## locationNANTUCKET COUNTY     .         
+## locationNASSAU COUNTY        .         
+## locationNORFOLK COUNTY       .         
+## locationOKALOOSA COUNTY      .         
+## locationOKEECHOBEE COUNTY    .         
+## locationORANGE COUNTY        .         
+## locationOSCEOLA COUNTY       .         
+## locationOTERO COUNTY         .         
+## locationOURAY COUNTY         .         
+## locationPALM BEACH COUNTY    .         
+## locationPARK COUNTY          .         
+## locationPASCO COUNTY         .         
+## locationPHILLIPS COUNTY      .         
+## locationPINELLAS COUNTY      .         
+## locationPITKIN COUNTY        .         
+## locationPLYMOUTH COUNTY      .         
+## locationPOLK COUNTY          .         
+## locationPROWERS COUNTY       .         
+## locationPUEBLO COUNTY        .         
+## locationPUTNAM COUNTY        .         
+## locationRIO BLANCO COUNTY    .         
+## locationRIO GRANDE COUNTY    .         
+## locationROUTT COUNTY         .         
+## locationSAGUACHE COUNTY      .         
+## locationSAN JUAN COUNTY      .         
+## locationSAN MIGUEL COUNTY    .         
+## locationSANTA ROSA COUNTY    .         
+## locationSARASOTA COUNTY      .         
+## locationSEDGWICK COUNTY      .         
+## locationSEMINOLE COUNTY      .         
+## locationST. JOHNS COUNTY     .         
+## locationST. LUCIE COUNTY     .         
+## locationSUFFOLK COUNTY       .         
+## locationSUMMIT COUNTY        .         
+## locationSUMTER COUNTY        .         
+## locationSUWANNEE COUNTY      .         
+## locationTAYLOR COUNTY        .         
+## locationTELLER COUNTY        .         
+## locationUNION COUNTY         .         
+## locationVOLUSIA COUNTY       .         
+## locationWAKULLA COUNTY       .         
+## locationWALTON COUNTY        .         
+## locationWASHINGTON COUNTY    .         
+## locationWELD COUNTY          .         
+## locationWORCESTER COUNTY     .         
+## locationYUMA COUNTY          .         
+## stateFL                      0.01277906
+## stateMA                      .         
+## stateNC                      .         
+## driver_raceHispanic          .         
+## driver_raceWhite             .         
+## stops_per_year               0.11601297
+## stop_rate                    .         
+## search_rate                  .         
+## consent_search_rate         40.93482829
+## arrest_rate                  .</code></pre>
+<pre class="r"><code>set.seed(1234)
+
+data_6&lt;-open_policing[sample(nrow(open_policing)),]
+folds_6&lt;-cut(seq(1:nrow(open_policing)),breaks=k,labels=F)
+
+diags&lt;-NULL
+for(i in 1:k){
+train_6&lt;-data_6[folds_6!=i,]
+test_6&lt;-data_6[folds_6==i,]
+truth_6&lt;-test_6$consent_search_bin
+fit_8&lt;-glm(consent_search_bin~stops_per_year,data=train_6,family=&quot;binomial&quot;)
+probs_6&lt;-predict(fit_8,newdata = test_6,type=&quot;response&quot;)
+preds_6&lt;-ifelse(probs_6&gt;.5,1,0)
+diags&lt;-rbind(diags,class_diag(probs_6,truth_6))
+}
+
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##         acc sens spec       ppv       auc
+## 1 0.6683051    1    0 0.6683051 0.6226937</code></pre>
+<div id="comparing-these-lasso-results-to-the-out-of-sample-accuracy-the-lasso-results-had-a-lower-specificity-but-had-a-greater-accuracy-sensitivity-precision-and-auc-compared-to-part-5.-this-means-higher-proportion-of-correctly-classified-cases-higher-true-positive-rate-greater-proportion-of-those-who-were-consented-to-a-search-that-were-correctly-predicted-and-greater-true-positive-rate-according-to-the-auc." class="section level4">
+<h4>Comparing these LASSO results to the out of sample accuracy, the LASSO results had a lower specificity, but had a greater accuracy, sensitivity, precision, and AUC compared to part 5. This means higher proportion of correctly classified cases, higher true positive rate, greater proportion of those who were consented to a search that were correctly predicted, and greater true positive rate according to the AUC.</h4>
+</div>
+<div id="in-the-lasso-regression-i-did-not-add-the-variable-consent_search_cat-as-a-factor-in-the-final-regression.-this-is-because-consent_search_cat-is-the-categorical-version-yes-no-of-the-variable-consent_search_bin-10-and-all-the-results-came-out-to-11-when-using-that-as-a-factor-in-the-regression." class="section level4">
+<h4>In the LASSO regression, I did not add the variable consent_search_cat as a factor in the final regression. This is because consent_search_cat is the categorical version (yes, no) of the variable consent_search_bin (1,0) and all the results came out to 1/1 when using that as a factor in the regression.</h4>
+</div>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
