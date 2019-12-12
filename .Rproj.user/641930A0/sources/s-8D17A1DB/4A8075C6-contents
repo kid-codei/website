@@ -5,7 +5,7 @@
       <section id="about">
         <div class="container">
         <div class="avatar">
-          <img class="img-circle" src="{{ .Site.BaseURL }}img/{{ .Site.Params.avatar }}" alt="Responsive image">
+          <img class="img-circle" src="{{ .Site.BaseURL }}img/{{ .Site.Params.avatar }}" alt="It me." height=375px width=300pxx >
         </div>
         <h3>I'm <strong>{{ .Site.Params.author }}</strong>, a Data Scientest.</h3>
         <h3>I love all things data science, statistics, and maths.</h3>
