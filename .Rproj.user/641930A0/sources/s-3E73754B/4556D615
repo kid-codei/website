@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "152492367",
     "id" : "4556D615",
-    "lastKnownWriteTime" : 1576108786,
-    "last_content_update" : 1576108786,
+    "lastKnownWriteTime" : 1576129726,
+    "last_content_update" : 1576129726414,
     "path" : "~/Desktop/website/public/css/main.css",
     "project_path" : "public/css/main.css",
     "properties" : {
         "cursorPosition" : "191,34",
-        "scrollLine" : "0"
+        "scrollLine" : "175"
     },
     "read_only" : false,
     "read_only_alternatives" : [
