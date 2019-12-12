@@ -10,6 +10,43 @@ description: ''
 
 
 
-<div id="yeee-haw" class="section level2">
-<h2>YEEE HAW</h2>
+<div id="python-in-r" class="section level1">
+<h1>Python in R</h1>
+<div id="reticulate" class="section level3">
+<h3>Reticulate</h3>
+<div id="i-think-one-of-the-most-cool-python-thing-that-i-learned-this-semester-was-using-python-in-rstudio.-its-interesting-to-see-how-you-can-interact-with-different-languages-in-one-platform-and-the-reticulate-package-allows-you-to-do-just-that" class="section level4">
+<h4>I think one of the most cool Python thing that I learned this semester was using Python in RStudio. It’s interesting to see how you can interact with different languages in one platform, and the Reticulate package allows you to do just that!</h4>
+<pre class="r"><code>library(reticulate)
+
+a &lt;- &quot;Swag&quot;</code></pre>
+<pre class="python"><code>b = &#39;money&#39;
+
+print(r.a ,b)</code></pre>
+<pre><code>## (&#39;Swag&#39;, &#39;money&#39;)</code></pre>
+<pre class="r"><code>cat(c(a,py$b))</code></pre>
+<pre><code>## Swag money</code></pre>
+</div>
+</div>
+<div id="computational-biology-context" class="section level3">
+<h3>Computational Biology Context</h3>
+<div id="another-python-use-that-i-found-was-using-it-in-the-context-of-computational-biology.-i-personally-did-much-of-my-computational-biology-research-in-r-but-pythons-strength-with-strings-allow-you-to-solve-all-sorts-of-problems." class="section level4">
+<h4>Another python use that I found was using it in the context of computational biology. I personally did much of my computational biology research in R, but python’s strength with strings allow you to solve all sorts of problems.</h4>
+<pre class="python"><code>my_seq2 = &quot;CAGCCCAATCAGGCTCTACTGCCACTAAACTTACGCAGGATATATTTACGCCGACGTACT&quot;
+
+def kmer(seq):
+    codon_table = {}
+    for i in range(len(seq)-2):
+        if seq[i:i+3] in codon_table:
+            codon_table[seq[i:i+3]] += 1
+        else:
+            codon_table[seq[i:i+3]] = 1
+    return codon_table
+
+kmer(my_seq2)</code></pre>
+<pre><code>## {&#39;CTT&#39;: 1, &#39;AAA&#39;: 1, &#39;ATC&#39;: 1, &#39;AAC&#39;: 1, &#39;ATA&#39;: 2, &#39;AGG&#39;: 2, &#39;CTC&#39;: 1, &#39;AGC&#39;: 1, &#39;AAT&#39;: 1, &#39;ATT&#39;: 1, &#39;CTG&#39;: 1, &#39;CTA&#39;: 2, &#39;ACT&#39;: 4, &#39;CAC&#39;: 1, &#39;ACG&#39;: 3, &#39;CAA&#39;: 1, &#39;CCA&#39;: 2, &#39;CCG&#39;: 1, &#39;CCC&#39;: 1, &#39;TAT&#39;: 2, &#39;CGA&#39;: 1, &#39;CAG&#39;: 3, &#39;TCT&#39;: 1, &#39;GAT&#39;: 1, &#39;TTT&#39;: 1, &#39;TGC&#39;: 1, &#39;GGA&#39;: 1, &#39;TAA&#39;: 1, &#39;GGC&#39;: 1, &#39;TAC&#39;: 4, &#39;TTA&#39;: 2, &#39;GAC&#39;: 1, &#39;CGT&#39;: 1, &#39;TCA&#39;: 1, &#39;GCA&#39;: 1, &#39;GTA&#39;: 1, &#39;GCC&#39;: 3, &#39;GCT&#39;: 1, &#39;CGC&#39;: 2}</code></pre>
+</div>
+<div id="in-this-situation-i-was-able-to-use-python-to-analyze-a-dna-string-for-all-of-the-codons-possible-within-the-3-different-reading-frames." class="section level4">
+<h4>In this situation, I was able to use python to analyze a DNA string for all of the codons possible within the 3 different reading frames.</h4>
+</div>
+</div>
 </div>

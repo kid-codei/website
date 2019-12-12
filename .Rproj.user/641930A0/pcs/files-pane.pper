@@ -1,5 +1,5 @@
 {
-    "path" : "~/Desktop/website/themes/hugo-sustain/archetypes",
+    "path" : "~/Desktop/website/themes/hugo-sustain/layouts/partials",
     "sortOrder" : [
         {
             "ascending" : true,
