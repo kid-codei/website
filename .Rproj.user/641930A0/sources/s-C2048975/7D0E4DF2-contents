@@ -1,0 +1,203 @@
+---
+title: "project2_jec4968"
+author: "John Henry Cruz"
+date: "11/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project 2
+
+```{r}
+library(readr)
+library(tidyverse)
+library(tidyr)
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(lmtest)
+library(sandwich)
+library(MASS)
+library(plotROC)
+
+```
+
+## 0) My Dataset
+```{r}
+combined_data <- readr::read_csv("https://raw.githubusercontent.com/5harad/openpolicing/master/results/data_for_figures/combined_data.csv")
+
+open_policing <- combined_data %>% dplyr::select(1:8) %>%na.omit() 
+
+open_policing_binary <- open_policing %>% mutate(consent_search_rate = case_when(consent_search_rate == 0 ~ 0, TRUE ~ 1)) %>% rename('consent_search_rate_bin' = consent_search_rate)
+
+open_policing <- left_join(open_policing, open_policing_binary)
+
+```
+
+#### The combined_data dataset is based off the Stanford Open Policing Project. This dataset was created by multiple researchers that wanted to create a repository detailing interactions between the police and the public. Their compiled dataset has over 2 million stops, so  this dataset from GitHub is a small part of it. I then filtered the dataset into fewer variables that I was more interested in and removed NA's. This made the dataset work so that both categorical variables had 2-5 groups and all numerical variables had no NA's, except the location variable because that has overlaps that needed to show to understand the data. I removed 3 numerical variables because they were lacking a great amount of data across multiple states and multiple driver races. I also wanted to make sure that the driver races in each numerical variable were complete in the sense that the specific location in that state had a complete set of driver_race(White, Black, and Hispanic). Since the data is somewhat grouped by location, I wanted to make sure that this was consistent, and chose the numerical variables that would allow this to happen. Since the consent_search_rate variable had low numerical values, I decided to make those that were 0 to 0 and any instance of consent_search_rate to 1, and make a new binary variable that would be used later in the project. The varibles are location (the county that the stop happened in) state (where the traffic stop happened) driver_race (the race of the driver), stops_per_year(the number of stops for that race in that state in that location in a year), stop_rate (the percentage that that race in that state in that location gets stopped), search_rate (the percentage that that race in that state in that location gets searched), consent_search_rate (the percentage that that race in that state in that location gets searched with consent), and arrest_rate (the percentage that that race in that state in that location gets arrested).
+
+## 1) MANOVA Testing
+
+### MANOVA
+```{r}
+manova_data <- manova(cbind(stops_per_year, stop_rate, search_rate, consent_search_rate, arrest_rate)~driver_race, data=combined_data)
+
+summary(manova_data)
+
+```
+
+### ANOVA
+```{r}
+summary.aov(manova_data)
+```
+
+### Means of Each Group Across the Numerical Variables
+```{r}
+open_policing%>%group_by(driver_race)%>%summarize(mean(stops_per_year),mean(stop_rate),mean(search_rate),mean(consent_search_rate),mean(arrest_rate))
+
+```
+
+### Post Hoc test for Stops per Year
+```{r}
+pairwise.t.test(open_policing$stops_per_year,open_policing$driver_race,
+p.adj="none")
+```
+
+### Post Hoc test for Stop Rate
+```{r}
+pairwise.t.test(open_policing$stop_rate,open_policing$driver_race,
+p.adj="none")
+```
+
+### Post Hoc test for Search Rate
+```{r}
+pairwise.t.test(open_policing$search_rate,open_policing$driver_race,
+p.adj="none")
+```
+
+### Post Hoc test for Consent Search Rate
+```{r}
+pairwise.t.test(open_policing$consent_search_rate,open_policing$driver_race,
+p.adj="none")
+```
+
+### Post Hoc test for Arrest Rate
+```{r}
+pairwise.t.test(open_policing$arrest_rate,open_policing$driver_race,
+p.adj="none")
+```
+
+### Discussion 
+
+#### In total, 21 tests were performed; 1 MANOVA, 5 ANOVA, and 15 post hoc t tests. 0.05/21 = 0.002380952, which is the new level of significance that we will be looking at.
+
+#### The MANOVA test results show significance(p val = 2.2e-16), so we should look at individual ANOVA's for each numerical variable against driver_race to look for significance between those groups. 
+
+#### An ANOVA test for each of the 5 numerical variables showed significant except one variable, stop_rate. 3 post hoc tests where then ran for each of the 5 numerical variables tested to see which groups are significant whithin that numerical variable. But we only look at 4 of the numerical variables since one of them is not statistically significant.
+
+#### In stops_per_year, there was significance seem between Whites and Blacks and Whites and Hispanics. 
+
+#### In search_rate, there was significance seem between Whites and Blacks and Whites and Hispanics. 
+
+#### In consent_search_rate, there was significance seem between Whites and Blacks and Whites and Hispanics. 
+
+#### In arrest_rate, there was significance seem between Whites and Blacks and Whites and Hispanics and Blacks and Hispanics. 
+
+#### In regards to the assumptions of the MANOVA, they most likely have been met, but there is a possibility that they weren't. This is because the data that was collected by the project was a compilation of all the data that the project could get, and not random samples within all the traffic stops that were recorded by the state. The results of the post hoc tests do show that a lot of the results show significance of the numerical variables towards Whites versus Blacks and Hispanics which may show that there is some unnormality in the data. But there doesn't seem to be any extreme outliers or extreme multicollinearity between any of the variables. 
+
+## 2) Randomization Test
+
+### Finding Mean of Distribution
+```{r}
+open_policing%>%group_by(consent_search_rate_bin)%>%summarize(m=mean(arrest_rate))%>%summarize(diff(m))
+
+```
+
+### Random Distribution and p value Result
+```{r}
+rand_dist<-vector()
+for(i in 1:5000){
+new<-data.frame(arrestrate=sample(open_policing$arrest_rate),consentsearchratebin=open_policing$consent_search_rate_bin)
+rand_dist[i]<-mean(new[new$consentsearchratebin=="1",]$arrestrate)-
+mean(new[new$consentsearchratebin=="0",]$arrestrate)
+}
+
+mean(rand_dist > 0.005091409)*2 #pvalue
+
+```
+
+### Visualization of the Random Distribution
+```{r}
+{hist(rand_dist,main="",ylab=""); abline(v = 0.005091409	,col="red")}
+```
+
+### Discussion
+
+#### I wanted to see if there was a statistical significance between arrest rate and consent to search rate. I used the binary version of the consent to stop rate to run this randomization test.
+
+#### Ho : mean arrest rate to of drivers is the same for consent vs. non-consent searches
+#### Ha : mean arrest rate to of drivers is different for consent vs. non-consent searches
+
+#### The results of the randomization tests show that the model is mostly normal with a slight skew towards the lower values. There is a great enough difference in the means that shows that there is a significant difference between the arrest rates of drivers that had or didn't have consented searches. This was verified with the p value of 0.0328 which is < 0.05. The line of the mean in the histogram(shown in red) also shows the mean far away from the mean of the distribution, further arguing for the significance. 
+
+## 3) Linear Regression Model
+
+### Interpret Coefficient Estimates
+```{r}
+fit<-lm(BP ~ Diabetic*BMI, data=meddat)
+summary(fit)
+```
+
+### Plot Regression
+```{r}
+ggplot(meddat, aes(x=BMI, y=BP,group=Diabetic))+geom_point(aes(color=Diabetic))+
+geom_smooth(method="lm",formula=y~1,se=F,fullrange=T,aes(color=Diabetic))+
+theme(legend.position=c(.9,.19))+xlab("")
+```
+
+### Check Assumptions
+```{r}
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+
+ggplot()+geom_histogram(aes(resids), bins=20)
+
+ggplot(med,aes(BMI,Glucose,color=Diabetic))+geom_point()
+```
+
+### Regression Results with Robust Standard Error
+```{r}
+coeftest(fit, vcov = vcovHC(fit))[,1:2]
+```
+
+### Proportion of Variance in Outcome Explained by Model
+```{r}
+
+```
+
+### Rerun the Regression but without Interactions 
+```{r}
+fit<-lm(BP ~ Diabetic + BMI, data=meddat)
+summary(fit)
+```
+
+
+## 4) Bootstrapped Standard Errors
+```{r}
+
+```
+
+## 5) Logistic Regression Model
+```{r}
+
+```
+
+## 6) LASSO Regression
+```{r}
+
+```
+
