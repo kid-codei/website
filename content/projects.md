@@ -14,4 +14,4 @@ Here are some projects I have been working on:
 
 - [Timeseries Pipeline on House Finch Data](/project1/)
 
-- [Analysis	of Stanford Open Policing Project](/project2/)
+- [Analysis	of Stanford Open Policing Project](/analysisofstandfordopenpolicingproject/)
