@@ -2,7 +2,9 @@
 title: "project2_jec4968"
 author: "John Henry Cruz"
 date: "11/24/2019"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

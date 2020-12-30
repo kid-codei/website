@@ -15,3 +15,5 @@ Here are some projects I have been working on:
 - [Timeseries Pipeline on House Finch Data](/timeseriespipelineonhousefinchdata/)
 
 - [Analysis	of Stanford Open Policing Project](/analysisofstandfordopenpolicingproject/)
+
+- [What Factors Contribute to A Top Tier Red Wine? An Analysis](/wine_quality/)

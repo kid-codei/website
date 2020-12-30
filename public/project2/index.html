@@ -76,12 +76,12 @@
 <h2>Project 2</h2>
 <pre class="r"><code>library(readr)
 library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
-<pre><code>## ✔ ggplot2 3.2.1     ✔ dplyr   0.8.3
+<pre><code>## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.3.0     ✔ dplyr   0.8.3
 ## ✔ tibble  2.1.3     ✔ stringr 1.4.0
 ## ✔ tidyr   1.0.0     ✔ forcats 0.4.0
 ## ✔ purrr   0.3.3</code></pre>
-<pre><code>## ── Conflicts ───────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(tidyr)
@@ -331,7 +331,7 @@ mean(new[new$consentsearchratebin==&quot;0&quot;,]$arrestrate)
 }
 
 mean(rand_dist &gt; 0.005091409)*2 #pvalue</code></pre>
-<pre><code>## [1] 0.034</code></pre>
+<pre><code>## [1] 0.0336</code></pre>
 </div>
 <div id="visualization-of-the-random-distribution" class="section level3">
 <h3>Visualization of the Random Distribution</h3>
@@ -343,10 +343,10 @@ mean(rand_dist &gt; 0.005091409)*2 #pvalue</code></pre>
 <div id="i-wanted-to-see-if-there-was-a-statistical-significance-between-arrest-rate-and-consent-to-search-rate.-i-used-the-binary-version-of-the-consent-to-stop-rate-to-run-this-randomization-test." class="section level4">
 <h4>I wanted to see if there was a statistical significance between arrest rate and consent to search rate. I used the binary version of the consent to stop rate to run this randomization test.</h4>
 </div>
-<div id="ho-mean-arrest-rate-to-of-drivers-is-the-same-for-consent-vs.non-consent-searches" class="section level4">
+<div id="ho-mean-arrest-rate-to-of-drivers-is-the-same-for-consent-vs.-non-consent-searches" class="section level4">
 <h4>Ho : mean arrest rate to of drivers is the same for consent vs. non-consent searches</h4>
 </div>
-<div id="ha-mean-arrest-rate-to-of-drivers-is-different-for-consent-vs.non-consent-searches" class="section level4">
+<div id="ha-mean-arrest-rate-to-of-drivers-is-different-for-consent-vs.-non-consent-searches" class="section level4">
 <h4>Ha : mean arrest rate to of drivers is different for consent vs. non-consent searches</h4>
 </div>
 <div id="the-results-of-the-randomization-tests-show-that-the-model-is-mostly-normal-with-a-slight-skew-towards-the-lower-values.-there-is-a-great-enough-difference-in-the-means-that-shows-that-there-is-a-significant-difference-between-the-arrest-rates-of-drivers-that-had-or-didnt-have-consented-searches.-this-was-verified-with-the-p-value-of-0.0328-which-is-0.05.-the-line-of-the-mean-in-the-histogramshown-in-red-also-shows-the-mean-far-away-from-the-mean-of-the-distribution-further-arguing-for-the-significance." class="section level4">
@@ -394,6 +394,7 @@ stop_rate is lesser by -0.0024267 compared to there being no stop.</p>
 <pre class="r"><code>ggplot(open_policing, aes(x=stop_rate, y=arrest_rate,group=consent_search_cat))+geom_point(aes(color=consent_search_cat))+
 geom_smooth(method=&quot;lm&quot;,se=F,fullrange=T,aes(color=consent_search_cat))+
 theme(legend.position=c(.9,.19))+xlab(&quot;&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/Project2_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
 <div id="check-assumptions" class="section level3">
@@ -474,11 +475,11 @@ coef(fit_boot)
 })
 samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
 <pre><code>##   (Intercept) consent_search_catyes stop_rate_c
-## 1 0.002600338           0.002830064 0.004028053
+## 1 0.002612509           0.002854877 0.004140039
 ##   consent_search_catyes:stop_rate_c
-## 1                       0.004295388</code></pre>
+## 1                       0.004374066</code></pre>
 <div id="all-of-the-standard-errors-original-robust-and-bootstrap-have-extremely-similar-standard-errors-for-consent_search_catyes-and-consent_search_catyesstop_rate_c.-the-stop_rate_c-is-the-variable-that-have-varying-standard-errors-across-the-three-different-standard-error-measurements.-the-original-standard-error-had-a-much-lower-standard-error-and-the-bootstrapped-standard-error-had-a-greater-standard-error-which-the-robust-standard-error-staying-around-0.002.-the-original-standard-error-for-stop_rate_c-would-have-a-lower-p-value-than-the-robust-and-bootstrapped-standard-errors-and-the-bootstrapped-standard-errors-would-have-a-higher-p-value-than-the-robust-and-original-standard-errors." class="section level4">
-<h4>All of the standard errors (original, robust, and bootstrap) have extremely similar standard errors for consent_search_catyes and consent_search_catyes:stop_rate_c. The stop_rate_c is the variable that have varying standard errors across the three different standard error measurements. The original standard error had a much lower standard error and the bootstrapped standard error had a greater standard error, which the robust standard error staying around ~ 0.002. The original standard error for stop_rate_c would have a lower p value than the robust and bootstrapped standard errors, and the bootstrapped standard errors would have a higher p value than the robust and original standard errors.</h4>
+<h4>All of the standard errors (original, robust, and bootstrap) have extremely similar standard errors for consent_search_catyes and consent_search_catyes:stop_rate_c. The stop_rate_c is the variable that have varying standard errors across the three different standard error measurements. The original standard error had a much lower standard error and the bootstrapped standard error had a greater standard error, which the robust standard error staying around ~ 0.002. The original standard error for stop_rate_c would have a lower p value than the robust and bootstrapped standard errors, and the bootstrapped standard errors would have a higher p value than the robust and original standard errors.</h4>
 </div>
 </div>
 <div id="logistic-regression-model" class="section level2">
