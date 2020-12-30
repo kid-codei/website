@@ -12,6 +12,6 @@ title: Projects
 
 Here are some projects I have been working on:
 
-- [Timeseries Pipeline on House Finch Data](/timeseriespipelineonhousefinchdata/)
+- [Timeseries Pipeline on House Finch Data](/timeseriespipefinchdata/)
 
 - [Analysis	of Stanford Open Policing Project](/analysisofstandfordopenpolicingproject/)
